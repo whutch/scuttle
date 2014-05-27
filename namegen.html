@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Fancy Random Name Generator</title>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+        <style>
+            body, input, textarea {
+                font-family: "Open Sans", sans-serif;;
+                font-size: 11pt;
+            }
+            span { display: inline-block; }
+            form span { vertical-align: top; }
+            
+            #seed-names { width: 300px; height: 200px; }
+            #options > div { margin-top: 5px; }
+            #amount, #min-count { width: 40px; }
+            #results {
+                font-size: 14pt;
+                margin-top: 10px;
+                width: 600px;
+            }
+            #message {
+                color: #777;
+                font-size: 9pt;
+                font-style: italic;
+                margin-top: 10px;
+            }
+        </style>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script type="text/javascript">
+
+            // Because JavaScript doesn't have this??
+            function random_int(min, max) {
+                return Math.floor(Math.random() * (max - min + 1) + min);
+            }
+
+            // Next two functions are mostly adapted from the blog post
+            //  "Random Name Generation" by Jim Storch
+            //  http://bogboa.blogspot.com/2009/12/random-name-generation.html
+            //  (it's nicer in Python)
+            function get_chunks(name) {
+                var lead = /^[aeiouy]*(?:qu|[bcdfghjklmnpqrstvwxz])+/;
+                var inner = /\B[aeiouy]+(?:qu|[bcdfghjklmnpqrstvwxz])+\B/g;
+                var tail = /[aeiouy]+(?:qu|[bcdfghjklmnpqrstvwxz])*$/;
+                name = name.toLowerCase();
+                return [name.match(lead), name.match(inner), name.match(tail)];
+            }
+
+            function make_names(seed_names, amount, minimum_count, allow_short) {
+                amount = typeof amount != 'undefined' ? amount : 10;
+                minimum_count = typeof minimum_count != 'undefined' ? minimum_count : 0;
+                allow_short = typeof allow_short != 'undefined' ? allow_short : true;
+                if (seed_names.length < 1) {
+                    return [];
+                }
+                // Build our lists of usable chunks first.
+                var lead_chunks = {}, inner_chunks = {}, tail_chunks = {};
+                $.each(seed_names, function(index, name) {
+                    var chunk;
+                    var chunks = get_chunks(name);
+                    if (chunks[0]) {
+                        chunk = chunks[0][0];
+                        lead_chunks[chunk] = (lead_chunks[chunk] || 0) + 1;
+                    }
+                    if (chunks[1]) {
+                        $.each(chunks[1], function(index, chunk) {
+                            inner_chunks[chunk] = (inner_chunks[chunk] || 0) + 1;
+                        });
+                    }
+                    if (chunks[2]) {
+                        chunk = chunks[2][0];
+                        tail_chunks[chunk] = (tail_chunks[chunk] || 0) + 1;
+                    }
+                });
+                var leads = [], inners = [], tails = [];
+                $.each(lead_chunks, function(chunk, count) {
+                    if (count >= minimum_count) {
+                        leads.push(chunk)
+                    }
+                });
+                $.each(inner_chunks, function(chunk, count) {
+                    if (count >= minimum_count) {
+                        inners.push(chunk)
+                    }
+                });
+                $.each(tail_chunks, function(chunk, count) {
+                    if (count >= minimum_count) {
+                        tails.push(chunk)
+                    }
+                });
+                if (leads.length < 1 || inners.length < 1 || tails.length < 1) {
+                    return [];
+                }
+                // We've got our lists, now we can build us some names!
+                var names = [];
+                for (var i = 0; i < amount; i++) {
+                    var random_inners = random_int(0, 1)
+                    random_inners += Number(!allow_short)
+                    if (Math.random() > 0.85) {
+                        random_inners += 1
+                    }
+                    var name = leads[random_int(0, leads.length - 1)];
+                    for (var j = 0; j < random_inners; j++) {
+                        name += inners[random_int(0, inners.length - 1)];
+                    }
+                    name += tails[random_int(0, tails.length - 1)];
+                    name = name.charAt(0).toUpperCase() + name.slice(1);
+                    names.push(name);
+                }
+                return names;
+            }
+
+            // Form processing stuff
+            function click_generate(event) {
+                var amount = Number($("#amount").val());
+                var minimum_count = Number($("#min-count").val());
+                var allow_short = $("#allow-short").is(":checked");
+                // "amount" and "minimum_count" could be NaN from the
+                //  Number conversion, so we're wrapping this in a NOT,
+                //  because NaN < 0 returns false.
+                if (!(amount >= 1)) {
+                    // todo: some sort of error message/color
+                    return;
+                }
+                if (!(minimum_count >= 0)) {
+                    // todo: some sort of error message/color
+                    return;
+                }
+                var seed_names = $("#seed-names").val()
+                                                 .replace(/[\t\n\r]/g, " ")
+                                                 .replace(/ +/g, " ")
+                seed_names = $.trim(seed_names).split(" ");
+                if (seed_names.length < 1 || seed_names[0] == "") {
+                    return;
+                }
+                var new_names = make_names(seed_names, amount, minimum_count, allow_short);
+                new_names = new_names.join(" ");
+                
+                // todo: filtering duplicate names
+                prev_names = $("#results").text()
+                if (prev_names) {
+                    prev_names += " ";
+                }
+                $("#results").text(prev_names + new_names);
+                
+                //$("#message").text("a message");
+                $("#clear").attr("disabled", false);
+            }
+
+            function click_clear(event) {
+                $("#results").text("");
+                $("#message").text("");
+                $(this).attr("disabled", true);
+            }
+
+            $(document).ready(function() {
+                $("#generate").on("click", click_generate);
+                $("#clear").on("click", click_clear);
+            });
+        </script>
+    </head>
+    <body>
+        <form>
+            <span>
+                <textarea name="seed-names" id="seed-names">Alice Bob Charlie Doug</textarea>
+            </span>
+            <span id="options">
+                <div>
+                    <input type="text" name="amount" id="amount" value="10"/>
+                    <label for="amount">Amount to generate</label>
+                </div>
+                <div>
+                    <input type="text" name="min-count" id="min-count" value="0"/>
+                    <label for="min-count">Minimum chunk count</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="allow-short" checked/>
+                    <label for="allow-short">Allow short</label>
+                </div>
+                <div>
+                    <input type="button" id="generate" value="Generate"/>
+                    <input type="reset" value="Reset"/>
+                </div>
+                <div>
+                    <input type="button" id="clear" value="Clear Results" disabled/>
+                </div>
+            </span>
+        </form>
+        <div id="results"></div>
+        <div id="message"></div>
+    </body>
+</html>
