@@ -9,12 +9,49 @@
                 font-family: "Open Sans", sans-serif;;
                 font-size: 11pt;
             }
-            span { display: inline-block; }
-            form span { vertical-align: top; }
+            span {
+                display: inline-block;
+            }
+            form span {
+                vertical-align: top;
+            }
+            h2 {
+                font-size: 14pt;
+                text-decoration: underline;
+                margin: 0 0 8px 0;
+            }
             
-            #seed-names { width: 300px; height: 200px; }
-            #options > div { margin-top: 5px; }
-            #amount, #min-count { width: 40px; }
+            #names-block h2,
+            #keepers-block h2,
+            #results-block h2 {
+                display: inline-block;
+            }
+            #presets {
+                margin-left: 15px;
+                width: 160px;
+            }
+            #seed-names {
+                height: 200px;
+                width: 300px;
+            }
+            #options-block {
+                margin-left: 10px;
+            }
+            #amount,
+            #min-count {
+                width: 40px;
+            }
+            #keepers-block {
+                margin-left: 20px;
+            }
+            #clear-keepers,
+            #clear-results {
+                font-size: 9pt;
+                margin-left: 15px;
+            }
+            #results-block {
+                margin-top: 20px;
+            }
             #results {
                 font-size: 14pt;
                 margin-top: 10px;
@@ -29,6 +66,21 @@
         </style>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script type="text/javascript">
+
+            // A big ol' block o' names
+            presets = {
+                "en-male": "english men",
+                "en-female": "english women",
+                "me-hobbits": "me hobbits",
+                "me-men": "me men",
+                "me-dwarves": "me dorfs",
+                "me-elves": "me elfmans",
+                "me-various": "me mixed",
+                "got-male": "got dudes?",
+                "got-female": "got dames?",
+                "hp-male": "hp boys",
+                "hp-female": "hp ladiez",
+            }
 
             // Because JavaScript doesn't have this??
             function random_int(min, max) {
@@ -112,6 +164,13 @@
             }
 
             // Form processing stuff
+            function change_preset(event) {
+                var names = presets[$(this).val()];
+                if (names != "") {
+                    $("#seed-names").val(names);
+                }
+            }
+
             function click_generate(event) {
                 var amount = Number($("#amount").val());
                 var minimum_count = Number($("#min-count").val());
@@ -145,49 +204,90 @@
                 $("#results").text(prev_names + new_names);
                 
                 //$("#message").text("a message");
-                $("#clear").attr("disabled", false);
+                $("#clear-results").attr("disabled", false);
             }
 
-            function click_clear(event) {
+            function click_clear_results(event) {
                 $("#results").text("");
                 $("#message").text("");
                 $(this).attr("disabled", true);
             }
 
+            function click_clear_keepers(event) {
+                $("#keepers").text("");
+                $(this).attr("disabled", true);
+            }
+
             $(document).ready(function() {
+                $("#presets").on("change", change_preset);
                 $("#generate").on("click", click_generate);
-                $("#clear").on("click", click_clear);
+                $("#clear-results").on("click", click_clear_results);
+                $("#clear-keepers").on("click", click_clear_keepers);
             });
         </script>
     </head>
     <body>
         <form>
-            <span>
-                <textarea name="seed-names" id="seed-names">Alice Bob Charlie Doug</textarea>
-            </span>
-            <span id="options">
+            <span id="names-block">
                 <div>
-                    <input type="text" name="amount" id="amount" value="10"/>
+                    <h2>Seed Names</h2>
+                    <select id="presets" name="presets">
+                        <option value="">Presets</option>
+                        <option value="">---------</option>
+                        <option value="en-male">English Male</option>
+                        <option value="en-female">English Female</option>
+                        <option value="me-hobbits">Middle-earth Hobbits</option>
+                        <option value="me-men">Middle-earth Men</option>
+                        <option value="me-dwarves">Middle-earth Dwarves</option>
+                        <option value="me-elves">Middle-earth Elves</option>
+                        <option value="me-various">Middle-earth Various</option>
+                        <option value="got-male">Game of Thrones Male</option>
+                        <option value="got-female">Game of Thrones Female</option>
+                        <option value="hp-male">Harry Potter Male</option>
+                        <option value="hp-female">Harry Pottery Female</option>
+                    </select>
+                </div>
+                <div>
+                    <textarea id="seed-names" name="seed-names">Alex Bobby Charlie Doug Edward Francis Gabriel Harold Ian James Kevin Larry Michael Nathan Oswald Peter Quincy Romeo Stephen Travis Usher Victor William Xavier Yancy Zack</textarea>
+                </div>
+            </span>
+            <span id="options-block">
+                <div>
+                    <h2>Options</h2>
+                </div>
+                <div>
+                    <input id="amount" type="text" name="amount" value="10"/>
                     <label for="amount">Amount to generate</label>
                 </div>
                 <div>
-                    <input type="text" name="min-count" id="min-count" value="0"/>
+                    <input id="min-count" type="text" name="min-count" value="0"/>
                     <label for="min-count">Minimum chunk count</label>
                 </div>
                 <div>
-                    <input type="checkbox" id="allow-short" checked/>
+                    <input id="allow-short" type="checkbox" checked/>
                     <label for="allow-short">Allow short</label>
                 </div>
                 <div>
-                    <input type="button" id="generate" value="Generate"/>
+                    <input id="generate" type="button" value="Generate"/>
                     <input type="reset" value="Reset"/>
                 </div>
+                <!-- todo: "keeper" box on right, name presets box above seed names, "Options" above options to level, clickable names via <a> to add to keepers -->
+            </span>
+            <span id="keepers-block" style="display: none;">
                 <div>
-                    <input type="button" id="clear" value="Clear Results" disabled/>
+                    <h2>Keepers</h2>
+                    <input id="clear-keepers" type="button" value="Clear" disabled/>
                 </div>
+                <div id="keepers"></div>
             </span>
         </form>
-        <div id="results"></div>
-        <div id="message"></div>
+        <div id="results-block">
+            <div>
+                <h2>Results</h2>
+                <input id="clear-results" type="button" value="Clear" disabled/>
+            </div>
+            <div id="results"></div>
+            <div id="message"></div>
+        </div>
     </body>
 </html>
