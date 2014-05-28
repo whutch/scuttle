@@ -2,30 +2,27 @@
 <html lang="en">
     <head>
         <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1"><!-- maximum-scale=1, user-scalable=no -->
         <title>Fancy Random Name Generator</title>
+        <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+        <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
         <style>
             body, input, textarea {
                 font-family: "Open Sans", sans-serif;;
                 font-size: 11pt;
             }
-            span {
-                display: inline-block;
-            }
-            form span {
-                vertical-align: top;
-            }
             h2 {
-                font-size: 14pt;
+                display: inline-block;
                 text-decoration: underline;
                 margin: 0 0 8px 0;
             }
             
-            #names-block h2,
-            #keepers-block h2,
-            #results-block h2 {
-                display: inline-block;
+            .row:not(:first-child) {
+                margin-top: 20px;
             }
+            
             #presets {
                 margin-left: 15px;
                 width: 160px;
@@ -34,37 +31,135 @@
                 height: 200px;
                 width: 300px;
             }
-            #options-block {
-                margin-left: 10px;
-            }
             #amount,
             #min-count {
                 width: 40px;
             }
-            #keepers-block {
-                margin-left: 20px;
-            }
             #clear-keepers,
             #clear-results {
-                font-size: 9pt;
-                margin-left: 15px;
-            }
-            #results-block {
-                margin-top: 20px;
-            }
-            #results {
-                font-size: 14pt;
-                margin-top: 10px;
-                width: 600px;
-            }
-            #message {
-                color: #777;
-                font-size: 9pt;
-                font-style: italic;
-                margin-top: 10px;
+                /*font-size: 9pt;
+                margin-left: 15px;*/
             }
         </style>
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    </head>
+    <body>
+        <form class="container">
+            <div class="row">
+                <span id="names-block" class="col-md-5">
+                    <div>
+                        <h2>Seed Names</h2>
+                        <!--
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle sr-only" type="button" id="dropdownMenu1" data-toggle="dropdown">
+                                <span class="caret"></span> Presets
+                            </button>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="en-male">English Male</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="en-female">English Female</a></li>
+                                <li role="presentation" class="divider"></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="me-hobbits">Middle-earth Hobbits</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="me-men">Middle-earth Men</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="me-dwarves">Middle-earth Dwarves</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="me-elves">Middle-earth Elves</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="me-various">Middle-earth Various</a></li>
+                                <li role="presentation" class="divider"></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="got-male">Game of Thrones Male</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="got-female">Game of Thrones Female</a></li>
+                                <li role="presentation" class="divider"></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="hp-male">Harry Potter Male</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="hp-female">Harry Potter Female</a></li>
+                            </ul>
+                        </div>
+                        -->
+                        <select id="presets" name="presets" class="form-control">
+                            <option value="">Presets</option>
+                            <option value="">---------</option>
+                            <option value="en-male">English Male</option>
+                            <option value="en-female">English Female</option>
+                            <option value="me-hobbits">Middle-earth Hobbits</option>
+                            <option value="me-men">Middle-earth Men</option>
+                            <option value="me-dwarves">Middle-earth Dwarves</option>
+                            <option value="me-elves">Middle-earth Elves</option>
+                            <option value="me-various">Middle-earth Various</option>
+                            <option value="got-male">Game of Thrones Male</option>
+                            <option value="got-female">Game of Thrones Female</option>
+                            <option value="hp-male">Harry Potter Male</option>
+                            <option value="hp-female">Harry Pottery Female</option>
+                        </select>
+                    </div>
+                    <div>
+                        <textarea id="seed-names" name="seed-names" class="form-control">Alex Bobby Charlie Doug Edward Francis Gabriel Harold Ian James Kevin Larry Michael Nathan Oswald Peter Quincy Romeo Stephen Travis Usher Victor William Xavier Yancy Zack</textarea>
+                    </div>
+                </span>
+                <span id="seed-options-block" class="col-md-5">
+                    <div>
+                        <h2>Options</h2>
+                        <button id="reset" type="reset" class="btn btn-danger btn-sm">
+                            <span class="glyphicon glyphicon-repeat"></span> Reset All
+                        </button>
+                    </div>
+                    <div>
+                        <input id="min-count" name="min-count" type="text" value="0" class="form-control"/>
+                        <label for="min-count">Minimum chunk count</label>
+                    </div>
+                    <div>
+                        
+                    </div>
+                    <!-- todo: "keeper" box on right, name presets box above seed names, "Options" above options to level, clickable names via <a> to add to keepers -->
+                </span>
+            </div>
+            <div class="row">
+                <span id="chunks-block" class="col-md-5">
+                    <div>
+                        <h2>Chunks</h2>
+                        <button id="load-chunks" type="button" class="btn btn-primary btn-sm">
+                            <span class="glyphicon glyphicon-arrow-down"></span> Add Chunks
+                        </button>
+                        <button id="clear-results" type="button" class="btn btn-default btn-sm" disabled>
+                            <span class="glyphicon glyphicon-remove"></span> Clear
+                        </button>
+                    </div>
+                    <div></div>
+                </span>
+                <span id="chunk-options-block" class="col-md-5">
+                    <div>
+                        <input id="amount" name="amount" type="text" value="10" class="form-control"/>
+                        <label for="amount">Amount to generate</label>
+                    </div>
+                    <div>
+                        <input id="allow-short" type="checkbox" checked/>
+                        <label for="allow-short">Allow short</label>
+                    </div>
+                    <!-- todo: "keeper" box on right, name presets box above seed names, "Options" above options to level, clickable names via <a> to add to keepers -->
+                </span>
+            </div>
+            <div class="row">
+                <span id="results-block" class="col-md-5">
+                    <div>
+                        <h2>Results</h2>
+                        <button id="generate" type="button" class="btn btn-primary btn-sm" disabled>
+                            <span class="glyphicon glyphicon-arrow-down"></span> Generate
+                        </button>
+                        <button id="clear-results" type="button" class="btn btn-default btn-sm" disabled>
+                            <span class="glyphicon glyphicon-remove"></span> Clear
+                        </button>
+                    </div>
+                    <div id="results"></div>
+                    <div id="message"></div>
+                </span>
+                <span id="keepers-block" class="col-md-5" style="display: none;">
+                    <div>
+                        <h2>Keepers</h2>
+                        <button id="clear-keepers" type="button" class="btn btn-default btn-sm" disabled>
+                            <span class="glyphicon glyphicon-remove"></span> Clear
+                        </button>
+                    </div>
+                    <div id="keepers"></div>
+                </span>
+            </div>
+        </form>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+        <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js" type="text/javascript"></script>
         <script type="text/javascript">
 
             // A big ol' block o' names
@@ -225,69 +320,5 @@
                 $("#clear-keepers").on("click", click_clear_keepers);
             });
         </script>
-    </head>
-    <body>
-        <form>
-            <span id="names-block">
-                <div>
-                    <h2>Seed Names</h2>
-                    <select id="presets" name="presets">
-                        <option value="">Presets</option>
-                        <option value="">---------</option>
-                        <option value="en-male">English Male</option>
-                        <option value="en-female">English Female</option>
-                        <option value="me-hobbits">Middle-earth Hobbits</option>
-                        <option value="me-men">Middle-earth Men</option>
-                        <option value="me-dwarves">Middle-earth Dwarves</option>
-                        <option value="me-elves">Middle-earth Elves</option>
-                        <option value="me-various">Middle-earth Various</option>
-                        <option value="got-male">Game of Thrones Male</option>
-                        <option value="got-female">Game of Thrones Female</option>
-                        <option value="hp-male">Harry Potter Male</option>
-                        <option value="hp-female">Harry Pottery Female</option>
-                    </select>
-                </div>
-                <div>
-                    <textarea id="seed-names" name="seed-names">Alex Bobby Charlie Doug Edward Francis Gabriel Harold Ian James Kevin Larry Michael Nathan Oswald Peter Quincy Romeo Stephen Travis Usher Victor William Xavier Yancy Zack</textarea>
-                </div>
-            </span>
-            <span id="options-block">
-                <div>
-                    <h2>Options</h2>
-                </div>
-                <div>
-                    <input id="amount" type="text" name="amount" value="10"/>
-                    <label for="amount">Amount to generate</label>
-                </div>
-                <div>
-                    <input id="min-count" type="text" name="min-count" value="0"/>
-                    <label for="min-count">Minimum chunk count</label>
-                </div>
-                <div>
-                    <input id="allow-short" type="checkbox" checked/>
-                    <label for="allow-short">Allow short</label>
-                </div>
-                <div>
-                    <input id="generate" type="button" value="Generate"/>
-                    <input type="reset" value="Reset"/>
-                </div>
-                <!-- todo: "keeper" box on right, name presets box above seed names, "Options" above options to level, clickable names via <a> to add to keepers -->
-            </span>
-            <span id="keepers-block" style="display: none;">
-                <div>
-                    <h2>Keepers</h2>
-                    <input id="clear-keepers" type="button" value="Clear" disabled/>
-                </div>
-                <div id="keepers"></div>
-            </span>
-        </form>
-        <div id="results-block">
-            <div>
-                <h2>Results</h2>
-                <input id="clear-results" type="button" value="Clear" disabled/>
-            </div>
-            <div id="results"></div>
-            <div id="message"></div>
-        </div>
     </body>
 </html>
