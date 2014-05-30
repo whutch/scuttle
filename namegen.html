@@ -7,6 +7,7 @@
         <title>Fancy Random Name Generator</title>
         <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" type="text/css">
         <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.3.5/bootstrap-select.min.css" rel="stylesheet" type="text/css">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
         <style>
             body, input, textarea {
@@ -16,20 +17,20 @@
             h2 {
                 display: inline-block;
                 text-decoration: underline;
-                margin: 0 0 8px 0;
+                margin: 0 20px 8px 0;
+            }
+            
+            .start-hidden {
+                display: none;
             }
             
             .row:not(:first-child) {
                 margin-top: 20px;
             }
             
-            #presets {
-                margin-left: 15px;
-                width: 160px;
-            }
             #seed-names {
                 height: 200px;
-                width: 300px;
+                width: 400px;
             }
             #amount,
             #min-count {
@@ -48,53 +49,37 @@
                 <span id="names-block" class="col-md-5">
                     <div>
                         <h2>Seed Names</h2>
-                        <!--
-                        <div class="dropdown">
-                            <button class="btn dropdown-toggle sr-only" type="button" id="dropdownMenu1" data-toggle="dropdown">
-                                <span class="caret"></span> Presets
-                            </button>
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="en-male">English Male</a></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="en-female">English Female</a></li>
-                                <li role="presentation" class="divider"></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="me-hobbits">Middle-earth Hobbits</a></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="me-men">Middle-earth Men</a></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="me-dwarves">Middle-earth Dwarves</a></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="me-elves">Middle-earth Elves</a></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="me-various">Middle-earth Various</a></li>
-                                <li role="presentation" class="divider"></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="got-male">Game of Thrones Male</a></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="got-female">Game of Thrones Female</a></li>
-                                <li role="presentation" class="divider"></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="hp-male">Harry Potter Male</a></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="hp-female">Harry Potter Female</a></li>
-                            </ul>
-                        </div>
-                        -->
-                        <select id="presets" name="presets" class="form-control">
-                            <option value="">Presets</option>
-                            <option value="">---------</option>
-                            <option value="en-male">English Male</option>
-                            <option value="en-female">English Female</option>
-                            <option value="me-hobbits">Middle-earth Hobbits</option>
-                            <option value="me-men">Middle-earth Men</option>
-                            <option value="me-dwarves">Middle-earth Dwarves</option>
-                            <option value="me-elves">Middle-earth Elves</option>
-                            <option value="me-various">Middle-earth Various</option>
-                            <option value="got-male">Game of Thrones Male</option>
-                            <option value="got-female">Game of Thrones Female</option>
-                            <option value="hp-male">Harry Potter Male</option>
-                            <option value="hp-female">Harry Pottery Female</option>
+                        <select id="presets" name="presets" class="selectpicker" data-style="btn-default btn-xs" data-width="180px" data-show-subtext="true">
+                            <option value="default">Presets</option>
+                            <optgroup label="English">
+                                <option value="en-male" data-subtext="English">Male</option>
+                                <option value="en-female" data-subtext="English">Female</option>
+                            </optgroup>
+                            <optgroup label="Middle-earth">
+                                <option value="me-hobbits" data-subtext="Middle-earth">Hobbits</option>
+                                <option value="me-men" data-subtext="Middle-earth">Men</option>
+                                <option value="me-dwarves" data-subtext="Middle-earth">Dwarves</option>
+                                <option value="me-elves" data-subtext="Middle-earth">Elves</option>
+                                <option value="me-various" data-subtext="Middle-earth">Various</option>
+                            </optgroup>
+                            <optgroup label="Game of Thrones">
+                                <option value="got-male" data-subtext="Game of Thrones">Male</option>
+                                <option value="got-female" data-subtext="Game of Thrones">Female</option>
+                            </optgroup>
+                            <optgroup label="Harry Potter">
+                                <option value="hp-male" data-subtext="Harry Potter">Male</option>
+                                <option value="hp-female" data-subtext="Harry Potter">Female</option>
+                            </optgroup>
                         </select>
                     </div>
                     <div>
-                        <textarea id="seed-names" name="seed-names" class="form-control">Alex Bobby Charlie Doug Edward Francis Gabriel Harold Ian James Kevin Larry Michael Nathan Oswald Peter Quincy Romeo Stephen Travis Usher Victor William Xavier Yancy Zack</textarea>
+                        <textarea id="seed-names" name="seed-names" class="form-control"></textarea>
                     </div>
                 </span>
                 <span id="seed-options-block" class="col-md-5">
                     <div>
                         <h2>Options</h2>
-                        <button id="reset" type="reset" class="btn btn-danger btn-sm">
+                        <button id="reset-all" type="reset" class="btn btn-danger btn-xs">
                             <span class="glyphicon glyphicon-repeat"></span> Reset All
                         </button>
                     </div>
@@ -112,10 +97,10 @@
                 <span id="chunks-block" class="col-md-5">
                     <div>
                         <h2>Chunks</h2>
-                        <button id="load-chunks" type="button" class="btn btn-primary btn-sm">
+                        <button id="load-chunks" type="button" class="btn btn-primary btn-xs">
                             <span class="glyphicon glyphicon-arrow-down"></span> Add Chunks
                         </button>
-                        <button id="clear-results" type="button" class="btn btn-default btn-sm" disabled>
+                        <button id="clear-results" type="button" class="btn btn-default btn-xs" disabled>
                             <span class="glyphicon glyphicon-remove"></span> Clear
                         </button>
                     </div>
@@ -137,10 +122,10 @@
                 <span id="results-block" class="col-md-5">
                     <div>
                         <h2>Results</h2>
-                        <button id="generate" type="button" class="btn btn-primary btn-sm" disabled>
+                        <button id="generate" type="button" class="btn btn-primary btn-xs" disabled>
                             <span class="glyphicon glyphicon-arrow-down"></span> Generate
                         </button>
-                        <button id="clear-results" type="button" class="btn btn-default btn-sm" disabled>
+                        <button id="clear-results" type="button" class="btn btn-default btn-xs" disabled>
                             <span class="glyphicon glyphicon-remove"></span> Clear
                         </button>
                     </div>
@@ -150,7 +135,7 @@
                 <span id="keepers-block" class="col-md-5" style="display: none;">
                     <div>
                         <h2>Keepers</h2>
-                        <button id="clear-keepers" type="button" class="btn btn-default btn-sm" disabled>
+                        <button id="clear-keepers" type="button" class="btn btn-default btn-xs" disabled>
                             <span class="glyphicon glyphicon-remove"></span> Clear
                         </button>
                     </div>
@@ -160,10 +145,12 @@
         </form>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
         <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js" type="text/javascript"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.3.5/bootstrap-select.min.js" type="text/javascript"></script>
         <script type="text/javascript">
 
             // A big ol' block o' names
             presets = {
+                "default": "Alex Bobby Charlie Doug Edward Francis Gabriel Harold Ian James Kevin Larry Michael Nathan Oswald Peter Quincy Romeo Stephen Travis Usher Victor William Xavier Yancy Zack",
                 "en-male": "english men",
                 "en-female": "english women",
                 "me-hobbits": "me hobbits",
@@ -265,7 +252,12 @@
                     $("#seed-names").val(names);
                 }
             }
-
+            
+            function click_reset_all(event) {
+                $("#presets").selectpicker("val", "default");
+                $("#seed-names").delay(100).val(presets["default"]);
+            }
+            
             function click_generate(event) {
                 var amount = Number($("#amount").val());
                 var minimum_count = Number($("#min-count").val());
@@ -283,7 +275,7 @@
                 }
                 var seed_names = $("#seed-names").val()
                                                  .replace(/[\t\n\r]/g, " ")
-                                                 .replace(/ +/g, " ")
+                                                 .replace(/ +/g, " ");
                 seed_names = $.trim(seed_names).split(" ");
                 if (seed_names.length < 1 || seed_names[0] == "") {
                     return;
@@ -314,7 +306,11 @@
             }
 
             $(document).ready(function() {
-                $("#presets").on("change", change_preset);
+                $("#presets")
+                    .on("change", change_preset)
+                    .selectpicker()
+                    .trigger("change");
+                $("#reset-all").on("click", click_reset_all);
                 $("#generate").on("click", click_generate);
                 $("#clear-results").on("click", click_clear_results);
                 $("#clear-keepers").on("click", click_clear_keepers);
