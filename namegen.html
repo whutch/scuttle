@@ -17,7 +17,17 @@
             h2 {
                 display: inline-block;
                 text-decoration: underline;
-                margin: 0 20px 8px 0;
+                margin: 0 15px 8px 0;
+            }
+            h2 + span > .btn {
+                margin-bottom: 10px;
+            }
+            input.form-control {
+                display: inline-block;
+            }
+            input[type="text"] {
+                height: 24px;
+                padding: 1px 3px;
             }
             
             .start-hidden {
@@ -33,7 +43,8 @@
                 width: 400px;
             }
             #amount,
-            #min-count {
+            #min-count,
+            #min-inner {
                 width: 40px;
             }
             #clear-keepers,
@@ -79,30 +90,30 @@
                 <span id="seed-options-block" class="col-md-5">
                     <div>
                         <h2>Options</h2>
-                        <button id="reset-all" type="reset" class="btn btn-danger btn-xs">
-                            <span class="glyphicon glyphicon-repeat"></span> Reset All
-                        </button>
+                        <span>
+                            <button id="reset-all" type="reset" class="btn btn-danger btn-xs">
+                                <span class="glyphicon glyphicon-repeat"></span> Reset All
+                            </button>
+                        </span>
                     </div>
                     <div>
-                        <input id="min-count" name="min-count" type="text" value="0" class="form-control"/>
+                        <input id="min-count" name="min-count" type="text" value="1" class="form-control"/>
                         <label for="min-count">Minimum chunk count</label>
                     </div>
-                    <div>
-                        
-                    </div>
-                    <!-- todo: "keeper" box on right, name presets box above seed names, "Options" above options to level, clickable names via <a> to add to keepers -->
                 </span>
             </div>
             <div class="row">
                 <span id="chunks-block" class="col-md-5">
                     <div>
                         <h2>Chunks</h2>
-                        <button id="load-chunks" type="button" class="btn btn-primary btn-xs">
-                            <span class="glyphicon glyphicon-arrow-down"></span> Add Chunks
-                        </button>
-                        <button id="clear-results" type="button" class="btn btn-default btn-xs" disabled>
-                            <span class="glyphicon glyphicon-remove"></span> Clear
-                        </button>
+                        <span>
+                            <button id="load-chunks" type="button" class="btn btn-primary btn-xs">
+                                <span class="glyphicon glyphicon-arrow-down"></span> Add Chunks
+                            </button>
+                            <button id="clear-results" type="button" class="btn btn-default btn-xs" disabled>
+                                <span class="glyphicon glyphicon-remove"></span> Clear
+                            </button>
+                        </span>
                     </div>
                     <div></div>
                 </span>
@@ -112,22 +123,23 @@
                         <label for="amount">Amount to generate</label>
                     </div>
                     <div>
-                        <input id="allow-short" type="checkbox" checked/>
-                        <label for="allow-short">Allow short</label>
+                        <input id="min-inner" name="min-inner" type="text" value="0" class="form-control"/>
+                        <label for="min-inner">Minimum inner chunks</label>
                     </div>
-                    <!-- todo: "keeper" box on right, name presets box above seed names, "Options" above options to level, clickable names via <a> to add to keepers -->
                 </span>
             </div>
             <div class="row">
                 <span id="results-block" class="col-md-5">
                     <div>
                         <h2>Results</h2>
-                        <button id="generate" type="button" class="btn btn-primary btn-xs" disabled>
-                            <span class="glyphicon glyphicon-arrow-down"></span> Generate
-                        </button>
-                        <button id="clear-results" type="button" class="btn btn-default btn-xs" disabled>
-                            <span class="glyphicon glyphicon-remove"></span> Clear
-                        </button>
+                        <span>
+                            <button id="generate" type="button" class="btn btn-primary btn-xs">
+                                <span class="glyphicon glyphicon-arrow-down"></span> Generate
+                            </button>
+                            <button id="clear-results" type="button" class="btn btn-default btn-xs" disabled>
+                                <span class="glyphicon glyphicon-remove"></span> Clear
+                            </button>
+                        </span>
                     </div>
                     <div id="results"></div>
                     <div id="message"></div>
@@ -181,10 +193,10 @@
                 return [name.match(lead), name.match(inner), name.match(tail)];
             }
 
-            function make_names(seed_names, amount, minimum_count, allow_short) {
+            function make_names(seed_names, amount, minimum_count, minimum_inner) {
                 amount = typeof amount != 'undefined' ? amount : 10;
-                minimum_count = typeof minimum_count != 'undefined' ? minimum_count : 0;
-                allow_short = typeof allow_short != 'undefined' ? allow_short : true;
+                minimum_count = typeof minimum_count != 'undefined' ? minimum_count : 1;
+                minimum_inner = typeof minimum_inner != 'undefined' ? minimum_inner : 0;
                 if (seed_names.length < 1) {
                     return [];
                 }
@@ -229,10 +241,9 @@
                 // We've got our lists, now we can build us some names!
                 var names = [];
                 for (var i = 0; i < amount; i++) {
-                    var random_inners = random_int(0, 1)
-                    random_inners += Number(!allow_short)
+                    var random_inners = Number(minimum_inner) + random_int(0, 1);
                     if (Math.random() > 0.85) {
-                        random_inners += 1
+                        random_inners += 1;
                     }
                     var name = leads[random_int(0, leads.length - 1)];
                     for (var j = 0; j < random_inners; j++) {
@@ -261,7 +272,7 @@
             function click_generate(event) {
                 var amount = Number($("#amount").val());
                 var minimum_count = Number($("#min-count").val());
-                var allow_short = $("#allow-short").is(":checked");
+                var minimum_inner = Number($("#min-inner").val());
                 // "amount" and "minimum_count" could be NaN from the
                 //  Number conversion, so we're wrapping this in a NOT,
                 //  because NaN < 0 returns false.
@@ -273,6 +284,10 @@
                     // todo: some sort of error message/color
                     return;
                 }
+                if (!(minimum_inner >= 0)) {
+                    // todo: some sort of error message/color
+                    return;
+                }
                 var seed_names = $("#seed-names").val()
                                                  .replace(/[\t\n\r]/g, " ")
                                                  .replace(/ +/g, " ");
@@ -280,7 +295,7 @@
                 if (seed_names.length < 1 || seed_names[0] == "") {
                     return;
                 }
-                var new_names = make_names(seed_names, amount, minimum_count, allow_short);
+                var new_names = make_names(seed_names, amount, minimum_count, minimum_inner);
                 new_names = new_names.join(" ");
                 
                 // todo: filtering duplicate names
