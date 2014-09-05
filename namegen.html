@@ -14,18 +14,8 @@
                 margin: 1em;
                 color: #333;
                 background-color: #ccc;
-                font-family: "Open Sans", sans-serif;;
+                font-family: "Open Sans", sans-serif;
                 font-size: 11pt;
-            }
-            span.col-md-5 {
-                padding: 1em;
-                background-color: #fff;
-                -webkit-box-shadow: 2px 2px 2px rgba(0,0,0,.25);
-                -moz-box-shadow: 2px 2px 2px rgba(0,0,0,.25);
-                box-shadow: 2px 2px 2px rgba(0,0,0,.25);
-            }
-            span.col-md-5:not(:first-child) {
-                margin-left: 1em;
             }
             h2 {
                 display: inline-block;
@@ -46,6 +36,16 @@
                 background-color: #eee;
             }*/
             
+            .block {
+                padding: 1em;
+                background-color: #fff;
+                -webkit-box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+                -moz-box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+                box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+            }
+            .block:not(:first-child) {
+                margin-top: 1em;
+            }
             .start-hidden {
                 display: none;
             }
@@ -55,15 +55,15 @@
             }
             
             #seed-names {
-                height: 200px;
-                width: 400px;
+                height: 120px;
+                width: 373px;
+                resize: none;
             }
             #amount,
             #min-count,
             #min-inner {
                 width: 40px;
             }
-            #clear-keepers,
             #clear-results {
                 /*font-size: 9pt;
                 margin-left: 15px;*/
@@ -72,8 +72,8 @@
     </head>
     <body>
         <form class="container">
-            <div class="row">
-                <span id="names-block" class="col-md-5">
+            <span class="column col-md-6">
+                <div class="block" id="names-block">
                     <div>
                         <h2>Seed Names</h2>
                         <select id="presets" name="presets" class="selectpicker" data-style="btn-default btn-xs" data-width="180px" data-show-subtext="true">
@@ -102,8 +102,8 @@
                     <div>
                         <textarea id="seed-names" name="seed-names" class="form-control"></textarea>
                     </div>
-                </span>
-                <span id="seed-options-block" class="col-md-5">
+                </div>
+                <div class="block" id="seed-options-block">
                     <div>
                         <h2>Options</h2>
                         <span>
@@ -116,10 +116,16 @@
                         <input id="min-count" name="min-count" type="text" value="1" class="form-control"/>
                         <label for="min-count">Minimum chunk count</label>
                     </div>
-                </span>
-            </div>
-            <div class="row">
-                <span id="chunks-block" class="col-md-5">
+                    <div>
+                        <input id="amount" name="amount" type="text" value="10" class="form-control"/>
+                        <label for="amount">Amount to generate</label>
+                    </div>
+                    <div>
+                        <input id="min-inner" name="min-inner" type="text" value="0" class="form-control"/>
+                        <label for="min-inner">Minimum inner chunks</label>
+                    </div>
+                </div>
+                <div class="block" id="chunks-block">
                     <div>
                         <h2>Chunks</h2>
                         <span>
@@ -132,20 +138,10 @@
                         </span>
                     </div>
                     <div></div>
-                </span>
-                <span id="chunk-options-block" class="col-md-5">
-                    <div>
-                        <input id="amount" name="amount" type="text" value="10" class="form-control"/>
-                        <label for="amount">Amount to generate</label>
-                    </div>
-                    <div>
-                        <input id="min-inner" name="min-inner" type="text" value="0" class="form-control"/>
-                        <label for="min-inner">Minimum inner chunks</label>
-                    </div>
-                </span>
-            </div>
-            <div class="row">
-                <span id="results-block" class="col-md-5">
+                </div>
+            </span>
+            <span class="column col-md-6">
+                <div class="block" id="results-block">
                     <div>
                         <h2>Results</h2>
                         <span>
@@ -159,17 +155,8 @@
                     </div>
                     <div id="results"></div>
                     <div id="message"></div>
-                </span>
-                <span id="keepers-block" class="col-md-5" style="display: none;">
-                    <div>
-                        <h2>Keepers</h2>
-                        <button id="clear-keepers" type="button" class="btn btn-default btn-xs" disabled>
-                            <span class="glyphicon glyphicon-remove"></span> Clear
-                        </button>
-                    </div>
-                    <div id="keepers"></div>
-                </span>
-            </div>
+                </div>
+            </span>
         </form>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
         <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js" type="text/javascript"></script>
@@ -197,7 +184,7 @@
                 return Math.floor(Math.random() * (max - min + 1) + min);
             }
 
-            // Next two functions are mostly adapted from the blog post
+            // The next two functions are mostly adapted from the blog post
             //  "Random Name Generation" by Jim Storch
             //  http://bogboa.blogspot.com/2009/12/random-name-generation.html
             //  (it's nicer in Python)
