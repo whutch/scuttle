@@ -22,6 +22,12 @@
                 text-decoration: underline;
                 margin: 0 15px 8px 0;
             }
+            h3 {
+                font-size: 12pt;
+                font-style: italic;
+                font-weight: bold;
+                margin: 5px 0;
+            }
             h2 + span > .btn {
                 margin-bottom: 10px;
             }
@@ -32,10 +38,21 @@
                 height: 24px;
                 padding: 1px 3px;
             }
-            /*li:nth-child(even) {
+            tr:nth-child(even),
+            li:nth-child(even) {
                 background-color: #eee;
-            }*/
+            }
+            ul {
+                padding: 0;
+                list-style-type: none;
+            }
+            td {
+                padding: 5px 8px;
+            }
             
+            .clear {
+                clear: both;
+            }
             .block {
                 padding: 1em;
                 background-color: #fff;
@@ -46,10 +63,6 @@
             .block:not(:first-child) {
                 margin-top: 1em;
             }
-            .start-hidden {
-                display: none;
-            }
-            
             .row:not(:first-child) {
                 margin-top: 20px;
             }
@@ -60,22 +73,33 @@
                 resize: none;
             }
             #amount,
-            #min-count,
+            #min-frequency,
             #min-inner {
                 width: 40px;
             }
-            #clear-results {
-                /*font-size: 9pt;
-                margin-left: 15px;*/
+            #leads-list,
+            #inners-list,
+            #tails-list,
+            #results-list {
+                width: 100%;
+            }
+            
+            #results-list span {
+                border: 1px solid #999;
+                background: #fff;
+                padding: 0 3px;
+            }
+            #results-list span:not(:first-child) {
+                margin-left: 5px;
             }
         </style>
     </head>
     <body>
-        <form class="container">
+        <div class="container">
             <span class="column col-md-6">
                 <div class="block" id="names-block">
                     <div>
-                        <h2>Seed Names</h2>
+                        <h2>Seeds</h2>
                         <select id="presets" name="presets" class="selectpicker" data-style="btn-default btn-xs" data-width="180px" data-show-subtext="true">
                             <option value="default">Presets</option>
                             <optgroup label="English">
@@ -103,18 +127,14 @@
                         <textarea id="seed-names" name="seed-names" class="form-control"></textarea>
                     </div>
                 </div>
-                <div class="block" id="seed-options-block">
+                <form class="block" id="seed-options-block">
                     <div>
                         <h2>Options</h2>
                         <span>
-                            <button id="reset-all" type="reset" class="btn btn-danger btn-xs">
-                                <span class="glyphicon glyphicon-repeat"></span> Reset All
+                            <button type="reset" class="btn btn-default btn-xs"><!-- btn-danger -->
+                                <span class="glyphicon glyphicon-repeat"></span> Reset
                             </button>
                         </span>
-                    </div>
-                    <div>
-                        <input id="min-count" name="min-count" type="text" value="1" class="form-control"/>
-                        <label for="min-count">Minimum chunk count</label>
                     </div>
                     <div>
                         <input id="amount" name="amount" type="text" value="10" class="form-control"/>
@@ -124,20 +144,44 @@
                         <input id="min-inner" name="min-inner" type="text" value="0" class="form-control"/>
                         <label for="min-inner">Minimum inner chunks</label>
                     </div>
-                </div>
+                    <div>
+                        <input id="min-frequency" name="min-frequency" type="text" value="1" class="form-control"/>
+                        <label for="min-frequency">Minimum chunk frequency</label>
+                    </div>
+                </form>
                 <div class="block" id="chunks-block">
                     <div>
                         <h2>Chunks</h2>
                         <span>
-                            <button id="load-chunks" type="button" class="btn btn-primary btn-xs">
+                            <button id="add-chunks" type="button" class="btn btn-primary btn-xs">
                                 <span class="glyphicon glyphicon-arrow-down"></span> Add Chunks
                             </button>
-                            <button id="clear-results" type="button" class="btn btn-default btn-xs" disabled>
+                            <button id="clear-chunks" type="button" class="btn btn-default btn-xs">
                                 <span class="glyphicon glyphicon-remove"></span> Clear
                             </button>
                         </span>
                     </div>
-                    <div></div>
+                    <div>
+                        <span class="col-md-4">
+                            <h3>Leads</h3>
+                            <table id="leads-list">
+                                <tr><td colspan=2><i>None</i></td></tr>
+                            </table>
+                        </span>
+                        <span class="col-md-4">
+                            <h3>Inners</h3>
+                            <table id="inners-list">
+                                <tr><td colspan=2><i>None</i></td></tr>
+                            </table>
+                        </span>
+                        <span class="col-md-4">
+                            <h3>Tails</h3>
+                            <table id="tails-list">
+                                <tr><td colspan=2><i>None</i></td></tr>
+                            </table>
+                        </span>
+                    </div>
+                    <div class="clear"></div>
                 </div>
             </span>
             <span class="column col-md-6">
@@ -148,21 +192,29 @@
                             <button id="generate" type="button" class="btn btn-primary btn-xs">
                                 <span class="glyphicon glyphicon-arrow-down"></span> Generate
                             </button>
-                            <button id="clear-results" type="button" class="btn btn-default btn-xs" disabled>
+                            <button id="clear-results" type="button" class="btn btn-default btn-xs">
                                 <span class="glyphicon glyphicon-remove"></span> Clear
                             </button>
                         </span>
                     </div>
-                    <div id="results"></div>
+                    <table id="results-list">
+                        <tr><td colspan=2><i>None, generate some!</i></td></tr>
+                    </table>
                     <div id="message"></div>
                 </div>
             </span>
-        </form>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" type="text/javascript"></script>
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js" type="text/javascript"></script>
+        <!-- TODO: set back to jquery.min.js -->
         <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js" type="text/javascript"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.3.5/bootstrap-select.min.js" type="text/javascript"></script>
         <script type="text/javascript">
-
+            // Globals
+            leads = {};
+            inners = {};
+            tails = {};
+            results = [];
+            
             // A big ol' block o' names
             presets = {
                 "default": "Alex Bobby Charlie Doug Edward Francis Gabriel Harold Ian James Kevin Larry Michael Nathan Oswald Peter Quincy Romeo Stephen Travis Usher Victor William Xavier Yancy Zack",
@@ -177,18 +229,18 @@
                 "got-female": "got dames?",
                 "hp-male": "hp boys",
                 "hp-female": "hp ladiez",
-            }
+            };
 
             // Because JavaScript doesn't have this??
             function random_int(min, max) {
                 return Math.floor(Math.random() * (max - min + 1) + min);
             }
 
-            // The next two functions are mostly adapted from the blog post
+            // The next three functions are mostly adapted from the blog post
             //  "Random Name Generation" by Jim Storch
             //  http://bogboa.blogspot.com/2009/12/random-name-generation.html
             //  (it's nicer in Python)
-            function get_chunks(name) {
+            function get_chunks_from_name(name) {
                 var lead = /^[aeiouy]*(?:qu|[bcdfghjklmnpqrstvwxz])+/;
                 var inner = /\B[aeiouy]+(?:qu|[bcdfghjklmnpqrstvwxz])+\B/g;
                 var tail = /[aeiouy]+(?:qu|[bcdfghjklmnpqrstvwxz])*$/;
@@ -196,101 +248,135 @@
                 return [name.match(lead), name.match(inner), name.match(tail)];
             }
 
-            function make_names(seed_names, amount, minimum_count, minimum_inner) {
-                amount = typeof amount != 'undefined' ? amount : 10;
-                minimum_count = typeof minimum_count != 'undefined' ? minimum_count : 1;
-                minimum_inner = typeof minimum_inner != 'undefined' ? minimum_inner : 0;
+            function make_chunks(seed_names) {
                 if (seed_names.length < 1) {
-                    return [];
+                    return;
                 }
-                // Build our lists of usable chunks first.
-                var lead_chunks = {}, inner_chunks = {}, tail_chunks = {};
                 $.each(seed_names, function(index, name) {
+                    var chunks = get_chunks_from_name(name);
                     var chunk;
-                    var chunks = get_chunks(name);
                     if (chunks[0]) {
                         chunk = chunks[0][0];
-                        lead_chunks[chunk] = (lead_chunks[chunk] || 0) + 1;
+                        leads[chunk] = (leads[chunk] || 0) + 1;
                     }
                     if (chunks[1]) {
                         $.each(chunks[1], function(index, chunk) {
-                            inner_chunks[chunk] = (inner_chunks[chunk] || 0) + 1;
+                            inners[chunk] = (inners[chunk] || 0) + 1;
                         });
                     }
                     if (chunks[2]) {
                         chunk = chunks[2][0];
-                        tail_chunks[chunk] = (tail_chunks[chunk] || 0) + 1;
+                        tails[chunk] = (tails[chunk] || 0) + 1;
                     }
                 });
-                var leads = [], inners = [], tails = [];
-                $.each(lead_chunks, function(chunk, count) {
-                    if (count >= minimum_count) {
-                        leads.push(chunk)
+            }
+
+            function update_chunk_list(list_id, chunks) {
+                var html = "";
+                $.each(chunks, function(chunk, count) {
+                    html += "<tr><td>" + chunk + "</td><td>" + count + "</td></tr>";
+                });
+                if (html == "") {
+                    html = "<tr><td colspan=2><i>None</i></td></tr>";
+                }
+                $("#" + list_id).html(html);
+            }
+
+            function update_chunk_lists() {
+                update_chunk_list("leads-list", leads);
+                update_chunk_list("inners-list", inners);
+                update_chunk_list("tails-list", tails);
+            }
+
+            function make_names(amount, min_inner, min_frequency, weighted) {
+                amount = typeof amount != 'undefined' ? amount : 10;
+                min_inner = typeof min_inner != 'undefined' ? min_inner : 0;
+                min_frequency = typeof min_frequency != 'undefined' ? min_frequency : 1;
+                weighted = typeof weighted != 'undefined' ? weighted : false;
+                // Build our chunks pools based on the given options
+                var lead_pool = [];
+                $.each(leads, function(chunk, count) {
+                    if (count >= min_frequency) {
+                        lead_pool.push(chunk);
                     }
                 });
-                $.each(inner_chunks, function(chunk, count) {
-                    if (count >= minimum_count) {
-                        inners.push(chunk)
+                var inner_pool = [];
+                $.each(inners, function(chunk, count) {
+                    if (count >= min_frequency) {
+                        inner_pool.push(chunk);
                     }
                 });
-                $.each(tail_chunks, function(chunk, count) {
-                    if (count >= minimum_count) {
-                        tails.push(chunk)
+                var tail_pool = [];
+                $.each(tails, function(chunk, count) {
+                    if (count >= min_frequency) {
+                        tail_pool.push(chunk);
                     }
                 });
-                if (leads.length < 1 || inners.length < 1 || tails.length < 1) {
+                // Make sure we've got enough chunks to work with
+                if (lead_pool.length < 1 || tail_pool.length < 1) {
                     return [];
                 }
-                // We've got our lists, now we can build us some names!
-                var names = [];
+                if (min_inner > 0 && inner_pool.length < 1) {
+                    return [];
+                }
+                // We're good, now make us some names!
+                var new_names = [];
+                // todo: filtering duplicate names
                 for (var i = 0; i < amount; i++) {
-                    var random_inners = Number(minimum_inner) + random_int(0, 1);
+                    // 50% chance of 1 inner chunk (3 total)
+                    var random_inners = random_int(0, 1);
+                    // 15% chance of another inner chunk (4 total)
                     if (Math.random() > 0.85) {
                         random_inners += 1;
                     }
-                    var name = leads[random_int(0, leads.length - 1)];
+                    // Make sure we've got enough
+                    random_inners = Math.max(random_inners, min_inner);
+                    // Now make a name!
+                    var lead_used = lead_pool[random_int(0, lead_pool.length - 1)];
+                    var name = lead_used;
+                    var inners_used = [];
                     for (var j = 0; j < random_inners; j++) {
-                        name += inners[random_int(0, inners.length - 1)];
+                        inners_used.push(inner_pool[random_int(0, inner_pool.length - 1)]);
                     }
-                    name += tails[random_int(0, tails.length - 1)];
+                    name += inners_used.join("");
+                    var tail_used = tail_pool[random_int(0, tail_pool.length - 1)]
+                    name += tail_used;
                     name = name.charAt(0).toUpperCase() + name.slice(1);
-                    names.push(name);
+                    name_array = [name, lead_used, inners_used, tail_used];
+                    results.push(name_array);
+                    new_names.push(name_array);
                 }
-                return names;
+                return new_names;
+            }
+
+            function update_results_list() {
+                var html = "";
+                $.each(results, function(index, name_array) {
+                    name = name_array[0];
+                    html += "<tr><td>" + name + "</td><td>";
+                    html += '<span class="lead-chunk">' + name_array[1] + "</span>";
+                    $.each(name_array[2], function(chunk_index, chunk) {
+                        html += '<span class="inner-chunk">' + chunk + "</span>";
+                    });
+                    html += '<span class="tail-chunk">' + name_array[3] + "</span>";
+                    html += "</td></tr>";
+                });
+                if (html == "") {
+                    html = "<tr><td colspan=2><i>None, generate some!</i></td></tr>";
+                }
+                $("#results-list").html(html);
             }
 
             // Form processing stuff
+
             function change_preset(event) {
                 var names = presets[$(this).val()];
                 if (names != "") {
                     $("#seed-names").val(names);
                 }
             }
-            
-            function click_reset_all(event) {
-                $("#presets").selectpicker("val", "default");
-                $("#seed-names").delay(100).val(presets["default"]);
-            }
-            
-            function click_generate(event) {
-                var amount = Number($("#amount").val());
-                var minimum_count = Number($("#min-count").val());
-                var minimum_inner = Number($("#min-inner").val());
-                // "amount" and "minimum_count" could be NaN from the
-                //  Number conversion, so we're wrapping this in a NOT,
-                //  because NaN < 0 returns false.
-                if (!(amount >= 1)) {
-                    // todo: some sort of error message/color
-                    return;
-                }
-                if (!(minimum_count >= 0)) {
-                    // todo: some sort of error message/color
-                    return;
-                }
-                if (!(minimum_inner >= 0)) {
-                    // todo: some sort of error message/color
-                    return;
-                }
+
+            function click_add_chunks(event) {
                 var seed_names = $("#seed-names").val()
                                                  .replace(/[\t\n\r]/g, " ")
                                                  .replace(/ +/g, " ");
@@ -298,29 +384,43 @@
                 if (seed_names.length < 1 || seed_names[0] == "") {
                     return;
                 }
-                var new_names = make_names(seed_names, amount, minimum_count, minimum_inner);
-                new_names = new_names.join(" ");
-                
-                // todo: filtering duplicate names
-                prev_names = $("#results").text()
-                if (prev_names) {
-                    prev_names += " ";
+                make_chunks(seed_names);
+                update_chunk_lists();
+            }
+
+            function click_clear_chunks(event) {
+                leads = {};
+                inners = {};
+                tails = {};
+                update_chunk_lists();
+            }
+
+            function click_generate_results(event) {
+                var amount = Number($("#amount").val());
+                var min_inner = Number($("#min-inner").val());
+                var min_frequency = Number($("#min-frequency").val());
+                // These could be NaN from the Number conversion,
+                //  so we're wrapping this in a NOT, because
+                //  NaN < 0 returns false.
+                if (!(amount >= 1)) {
+                    // todo: some sort of error message/color
+                    return;
                 }
-                $("#results").text(prev_names + new_names);
-                
-                //$("#message").text("a message");
-                $("#clear-results").attr("disabled", false);
+                if (!(min_inner >= 0)) {
+                    // todo: some sort of error message/color
+                    return;
+                }
+                if (!(min_frequency >= 0)) {
+                    // todo: some sort of error message/color
+                    return;
+                }
+                var new_names = make_names(amount, min_inner, min_frequency);
+                update_results_list();
             }
 
             function click_clear_results(event) {
-                $("#results").text("");
-                $("#message").text("");
-                $(this).attr("disabled", true);
-            }
-
-            function click_clear_keepers(event) {
-                $("#keepers").text("");
-                $(this).attr("disabled", true);
+                results = [];
+                update_results_list();
             }
 
             $(document).ready(function() {
@@ -328,10 +428,10 @@
                     .on("change", change_preset)
                     .selectpicker()
                     .trigger("change");
-                $("#reset-all").on("click", click_reset_all);
-                $("#generate").on("click", click_generate);
+                $("#add-chunks").on("click", click_add_chunks);
+                $("#clear-chunks").on("click", click_clear_chunks);
+                $("#generate").on("click", click_generate_results);
                 $("#clear-results").on("click", click_clear_results);
-                $("#clear-keepers").on("click", click_clear_keepers);
             });
         </script>
     </body>
