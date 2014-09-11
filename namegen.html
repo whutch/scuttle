@@ -5,9 +5,9 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1"><!-- maximum-scale=1, user-scalable=no -->
         <title>Fancy Random Name Generator</title>
-        <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-        <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.3.5/bootstrap-select.min.css" rel="stylesheet" type="text/css">
+        <link href="static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+        <link href="static/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+        <link href="static/css/bootstrap-select.min.css" rel="stylesheet" type="text/css">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
         <style>
             body {
@@ -49,7 +49,7 @@
             td {
                 padding: 5px 8px;
             }
-            
+
             .clear {
                 clear: both;
             }
@@ -66,7 +66,7 @@
             .row:not(:first-child) {
                 margin-top: 20px;
             }
-            
+
             #seed-names {
                 height: 120px;
                 width: 373px;
@@ -83,13 +83,31 @@
             #results-list {
                 width: 100%;
             }
-            
-            #results-list span {
+
+            .chunk {
                 border: 1px solid #999;
                 background: #fff;
+                cursor: pointer;
                 padding: 0 3px;
             }
-            #results-list span:not(:first-child) {
+            .chunk:hover {
+                border: 1px solid #9acfea;
+            }
+            .chunk.include {
+                border: 1px solid #b2dba1;
+                background: #dff0d8;
+            }
+            .chunk.include:hover {
+                border: 1px solid #5b5;
+            }
+            .chunk.exclude {
+                border: 1px solid #dca7a7;
+                background: #f2dede
+            }
+            .chunk.exclude:hover {
+                border: 1px solid #b55;
+            }
+            .chunk:not(:first-child) {
                 margin-left: 5px;
             }
         </style>
@@ -164,19 +182,19 @@
                     <div>
                         <span class="col-md-4">
                             <h3>Leads</h3>
-                            <table id="leads-list">
+                            <table id="leads-list" data-chunk-type=0>
                                 <tr><td colspan=2><i>None</i></td></tr>
                             </table>
                         </span>
                         <span class="col-md-4">
                             <h3>Inners</h3>
-                            <table id="inners-list">
+                            <table id="inners-list" data-chunk-type=1>
                                 <tr><td colspan=2><i>None</i></td></tr>
                             </table>
                         </span>
                         <span class="col-md-4">
                             <h3>Tails</h3>
-                            <table id="tails-list">
+                            <table id="tails-list" data-chunk-type=2>
                                 <tr><td colspan=2><i>None</i></td></tr>
                             </table>
                         </span>
@@ -204,17 +222,23 @@
                 </div>
             </span>
         </div>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js" type="text/javascript"></script>
+        <script src="static/js/jquery-1.11.1.js" type="text/javascript"></script>
+        <script src="static/js/underscore.js" type="text/javascript"></script>
         <!-- TODO: set back to jquery.min.js -->
-        <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js" type="text/javascript"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.3.5/bootstrap-select.min.js" type="text/javascript"></script>
+        <script src="static/js/bootstrap.js" type="text/javascript"></script>
+        <script src="static/js/bootstrap-select.js" type="text/javascript"></script>
         <script type="text/javascript">
+            // The basic idea for this was mostly adapted from the
+            //   blog post "Random Name Generation" by Jim Storch
+            //  http://bogboa.blogspot.com/2009/12/random-name-generation.html
+            //  (it's nicer in Python)
+
             // Globals
-            leads = {};
-            inners = {};
-            tails = {};
+            chunks = [{}, {}, {}];
+            include = [[], [], []];
+            exclude = [[], [], []];
             results = [];
-            
+
             // A big ol' block o' names
             presets = {
                 "default": "Alex Bobby Charlie Doug Edward Francis Gabriel Harold Ian James Kevin Larry Michael Nathan Oswald Peter Quincy Romeo Stephen Travis Usher Victor William Xavier Yancy Zack",
@@ -236,10 +260,6 @@
                 return Math.floor(Math.random() * (max - min + 1) + min);
             }
 
-            // The next three functions are mostly adapted from the blog post
-            //  "Random Name Generation" by Jim Storch
-            //  http://bogboa.blogspot.com/2009/12/random-name-generation.html
-            //  (it's nicer in Python)
             function get_chunks_from_name(name) {
                 var lead = /^[aeiouy]*(?:qu|[bcdfghjklmnpqrstvwxz])+/;
                 var inner = /\B[aeiouy]+(?:qu|[bcdfghjklmnpqrstvwxz])+\B/g;
@@ -253,28 +273,28 @@
                     return;
                 }
                 $.each(seed_names, function(index, name) {
-                    var chunks = get_chunks_from_name(name);
+                    var new_chunks = get_chunks_from_name(name);
                     var chunk;
-                    if (chunks[0]) {
-                        chunk = chunks[0][0];
-                        leads[chunk] = (leads[chunk] || 0) + 1;
+                    if (new_chunks[0]) {
+                        chunk = new_chunks[0][0];
+                        chunks[0][chunk] = (chunks[0][chunk] || 0) + 1;
                     }
-                    if (chunks[1]) {
-                        $.each(chunks[1], function(index, chunk) {
-                            inners[chunk] = (inners[chunk] || 0) + 1;
+                    if (new_chunks[1]) {
+                        $.each(new_chunks[1], function(index, chunk) {
+                            chunks[1][chunk] = (chunks[1][chunk] || 0) + 1;
                         });
                     }
-                    if (chunks[2]) {
-                        chunk = chunks[2][0];
-                        tails[chunk] = (tails[chunk] || 0) + 1;
+                    if (new_chunks[2]) {
+                        chunk = new_chunks[2][0];
+                        chunks[2][chunk] = (chunks[2][chunk] || 0) + 1;
                     }
                 });
             }
 
-            function update_chunk_list(list_id, chunks) {
+            function update_chunk_list(list_id, new_chunks) {
                 var html = "";
-                $.each(chunks, function(chunk, count) {
-                    html += "<tr><td>" + chunk + "</td><td>" + count + "</td></tr>";
+                $.each(new_chunks, function(chunk, count) {
+                    html += '<tr><td><span class="chunk">' + chunk + "</span></td><td>" + count + "</td></tr>";
                 });
                 if (html == "") {
                     html = "<tr><td colspan=2><i>None</i></td></tr>";
@@ -283,9 +303,27 @@
             }
 
             function update_chunk_lists() {
-                update_chunk_list("leads-list", leads);
-                update_chunk_list("inners-list", inners);
-                update_chunk_list("tails-list", tails);
+                update_chunk_list("leads-list", chunks[0]);
+                update_chunk_list("inners-list", chunks[1]);
+                update_chunk_list("tails-list", chunks[2]);
+            }
+
+            function make_chunk_pool(chunk_type, min_frequency) {
+                var pool = [];
+                $.each(chunks[chunk_type], function(chunk, count) {
+                    if (include[chunk_type].length) {
+                        if (include[chunk_type].indexOf(chunk) < 0) {
+                            return;
+                        }
+                    }
+                    else if (exclude[chunk_type].indexOf(chunk) >= 0) {
+                        return;
+                    }
+                    if (count >= min_frequency) {
+                        pool.push(chunk);
+                    }
+                });
+                return pool;
             }
 
             function make_names(amount, min_inner, min_frequency, weighted) {
@@ -294,24 +332,9 @@
                 min_frequency = typeof min_frequency != 'undefined' ? min_frequency : 1;
                 weighted = typeof weighted != 'undefined' ? weighted : false;
                 // Build our chunks pools based on the given options
-                var lead_pool = [];
-                $.each(leads, function(chunk, count) {
-                    if (count >= min_frequency) {
-                        lead_pool.push(chunk);
-                    }
-                });
-                var inner_pool = [];
-                $.each(inners, function(chunk, count) {
-                    if (count >= min_frequency) {
-                        inner_pool.push(chunk);
-                    }
-                });
-                var tail_pool = [];
-                $.each(tails, function(chunk, count) {
-                    if (count >= min_frequency) {
-                        tail_pool.push(chunk);
-                    }
-                });
+                var lead_pool = make_chunk_pool(0, min_frequency);
+                var inner_pool = make_chunk_pool(1, min_frequency);
+                var tail_pool = make_chunk_pool(2, min_frequency);
                 // Make sure we've got enough chunks to work with
                 if (lead_pool.length < 1 || tail_pool.length < 1) {
                     return [];
@@ -323,7 +346,7 @@
                 var new_names = [];
                 // todo: filtering duplicate names
                 for (var i = 0; i < amount; i++) {
-                    // 50% chance of 1 inner chunk (3 total)
+                    // 50% chance of 1 inner chunk (3 total with lead and tail)
                     var random_inners = random_int(0, 1);
                     // 15% chance of another inner chunk (4 total)
                     if (Math.random() > 0.85) {
@@ -354,11 +377,11 @@
                 $.each(results, function(index, name_array) {
                     name = name_array[0];
                     html += "<tr><td>" + name + "</td><td>";
-                    html += '<span class="lead-chunk">' + name_array[1] + "</span>";
+                    html += '<span class="chunk">' + name_array[1] + "</span>";
                     $.each(name_array[2], function(chunk_index, chunk) {
-                        html += '<span class="inner-chunk">' + chunk + "</span>";
+                        html += '<span class="chunk">' + chunk + "</span>";
                     });
-                    html += '<span class="tail-chunk">' + name_array[3] + "</span>";
+                    html += '<span class="chunk">' + name_array[3] + "</span>";
                     html += "</td></tr>";
                 });
                 if (html == "") {
@@ -389,10 +412,39 @@
             }
 
             function click_clear_chunks(event) {
-                leads = {};
-                inners = {};
-                tails = {};
+                chunks = [{}, {}, {}];
+                include = [[], [], []];
+                exclude = [[], [], []];
                 update_chunk_lists();
+            }
+
+            function click_chunk(event) {
+                span = $(this);
+                chunk_type = span.parents("table").data("chunk-type");
+                chunk = span.text();
+                if (span.hasClass("include")) {
+                    // Cycle to exclude
+                    include[chunk_type] = _.without(include[chunk_type], chunk)
+                    if (exclude[chunk_type].indexOf(chunk) < 0) {
+                        exclude[chunk_type].push(chunk)
+                    }
+                    span.removeClass("include");
+                    span.addClass("exclude");
+                }
+                else if (span.hasClass("exclude")) {
+                    // Cycle to normal
+                    include[chunk_type] = _.without(include[chunk_type], chunk)
+                    exclude[chunk_type] = _.without(exclude[chunk_type], chunk)
+                    span.removeClass("exclude");
+                }
+                else {
+                    // Cycle to include
+                    if (include[chunk_type].indexOf(chunk) < 0) {
+                        include[chunk_type].push(chunk)
+                    }
+                    exclude[chunk_type] = _.without(exclude[chunk_type], chunk)
+                    span.addClass("include");
+                }
             }
 
             function click_generate_results(event) {
@@ -430,6 +482,7 @@
                     .trigger("change");
                 $("#add-chunks").on("click", click_add_chunks);
                 $("#clear-chunks").on("click", click_clear_chunks);
+                $("#chunks-block").on("click", ".chunk", click_chunk);
                 $("#generate").on("click", click_generate_results);
                 $("#clear-results").on("click", click_clear_results);
             });
