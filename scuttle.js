@@ -18,15 +18,6 @@ presets = {
     "default": "Alex Bobby Charlie Doug Edward Francis Gabriel Harold Ian James Kevin Larry Michael Nathan Oswald Peter Quincy Romeo Stephen Travis Usher Victor William Xavier Yancy Zack",
     "en-male": "english men",
     "en-female": "english women",
-    "me-hobbits": "me hobbits",
-    "me-men": "me men",
-    "me-dwarves": "me dorfs",
-    "me-elves": "me elfmans",
-    "me-various": "me mixed",
-    "got-male": "got dudes?",
-    "got-female": "got dames?",
-    "hp-male": "hp boys",
-    "hp-female": "hp ladiez",
 };
 
 // Because JavaScript doesn't have this??
