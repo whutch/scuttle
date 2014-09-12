@@ -1,0 +1,105 @@
+/*  Scuttle v0.2.3 (https://github.com/whutch/scuttle)
+*   Copyright 2014 Will Hutcheson
+ *  Licensed under MIT (https://github.com/whutch/scuttle/blob/master/LICENSE)
+*/
+
+body {
+    margin: 1em;
+    color: #333;
+    background-color: #ccc;
+    font-family: "Open Sans", sans-serif;
+    font-size: 11pt;
+}
+h2 {
+    display: inline-block;
+    text-decoration: underline;
+    margin: 0 15px 8px 0;
+}
+h3 {
+    font-size: 12pt;
+    font-style: italic;
+    font-weight: bold;
+    margin: 5px 0;
+}
+h2 + span > .btn {
+    margin-bottom: 10px;
+}
+input.form-control {
+    display: inline-block;
+}
+input[type="text"] {
+    height: 24px;
+    padding: 1px 3px;
+}
+tr:nth-child(even),
+li:nth-child(even) {
+    background-color: #eee;
+}
+ul {
+    padding: 0;
+    list-style-type: none;
+}
+td {
+    padding: 5px 8px;
+}
+
+.clear {
+    clear: both;
+}
+.block {
+    padding: 1em;
+    background-color: #fff;
+    -webkit-box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+    -moz-box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+    box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+.block:not(:first-child) {
+    margin-top: 1em;
+}
+.row:not(:first-child) {
+    margin-top: 20px;
+}
+
+#seed-names {
+    height: 120px;
+    width: 373px;
+    resize: none;
+}
+#amount,
+#min-frequency,
+#min-inner {
+    width: 40px;
+}
+#leads-list,
+#inners-list,
+#tails-list,
+#results-list {
+    width: 100%;
+}
+
+.chunk {
+    border: 1px solid #999;
+    background: #fff;
+    cursor: pointer;
+    padding: 0 3px;
+}
+.chunk:hover {
+    border: 1px solid #9acfea;
+}
+.chunk.include {
+    border: 1px solid #b2dba1;
+    background: #dff0d8;
+}
+.chunk.include:hover {
+    border: 1px solid #5b5;
+}
+.chunk.exclude {
+    border: 1px solid #dca7a7;
+    background: #f2dede
+}
+.chunk.exclude:hover {
+    border: 1px solid #b55;
+}
+.chunk:not(:first-child) {
+    margin-left: 5px;
+}
